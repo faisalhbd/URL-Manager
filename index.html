@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL Manager — dumpsterrental.tech</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+  .header { background: #1a1d2e; border-bottom: 1px solid #2d3148; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+  .header .badge { background: #2563eb; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+
+  .stats-bar { display: flex; gap: 12px; padding: 12px 24px; background: #13161f; border-bottom: 1px solid #1e2235; flex-wrap: wrap; }
+  .stat { background: #1a1d2e; border: 1px solid #2d3148; border-radius: 8px; padding: 8px 16px; min-width: 120px; }
+  .stat .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat .value { font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
+  .stat.green .value { color: #22c55e; }
+  .stat.blue .value { color: #3b82f6; }
+  .stat.amber .value { color: #f59e0b; }
+  .stat.red .value { color: #ef4444; }
+
+  .toolbar { display: flex; gap: 10px; padding: 12px 24px; background: #13161f; border-bottom: 1px solid #1e2235; flex-wrap: wrap; align-items: center; }
+  .toolbar input[type=text] { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 13px; width: 320px; outline: none; }
+  .toolbar input[type=text]:focus { border-color: #3b82f6; }
+  .toolbar select { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer; }
+  .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-success { background: #16a34a; color: #fff; }
+  .btn-danger { background: #dc2626; color: #fff; }
+  .btn-ghost { background: #1a1d2e; color: #94a3b8; border: 1px solid #2d3148; }
+  .btn-amber { background: #d97706; color: #fff; }
+
+  .import-section { padding: 16px 24px; background: #13161f; border-bottom: 1px solid #1e2235; display: none; }
+  .import-section.open { display: block; }
+  .import-section textarea { width: 100%; background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 10px; border-radius: 6px; font-size: 12px; font-family: monospace; height: 120px; resize: vertical; outline: none; }
+  .import-section .row { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
+  .import-section .info { font-size: 12px; color: #64748b; }
+
+  .batch-section { padding: 12px 24px; background: #0f1117; border-bottom: 1px solid #1e2235; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .batch-section label { font-size: 13px; color: #94a3b8; }
+  .batch-section input[type=number] { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 6px 10px; border-radius: 6px; font-size: 13px; width: 80px; outline: none; }
+  .copy-box { background: #1a1d2e; border: 1px solid #2d3148; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #94a3b8; font-family: monospace; max-height: 100px; overflow-y: auto; word-break: break-all; display: none; margin-top: 8px; white-space: pre-wrap; }
+
+  .url-list { padding: 0 24px 24px; }
+  .url-list table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+  .url-list th { background: #1a1d2e; color: #64748b; font-weight: 500; padding: 10px 12px; text-align: left; border-bottom: 1px solid #2d3148; position: sticky; top: 0; }
+  .url-list td { padding: 9px 12px; border-bottom: 1px solid #1e2235; color: #cbd5e1; vertical-align: middle; }
+  .url-list tr:hover td { background: #1a1d2e; }
+  .url-list .url-text { max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #93c5fd; font-family: monospace; font-size: 12px; }
+
+  .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .s-pending { background: #1e2235; color: #64748b; }
+  .s-copied { background: #1e3a5f; color: #60a5fa; }
+  .s-submitted { background: #14532d; color: #4ade80; }
+  .s-indexed { background: #1a3a1a; color: #22c55e; }
+  .s-failed { background: #3b0f0f; color: #f87171; }
+
+  .chk { cursor: pointer; width: 15px; height: 15px; accent-color: #3b82f6; }
+
+  .pagination { display: flex; gap: 8px; align-items: center; padding: 16px 24px; background: #13161f; border-top: 1px solid #1e2235; flex-wrap: wrap; }
+  .pagination button { background: #1a1d2e; border: 1px solid #2d3148; color: #94a3b8; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+  .pagination button.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .pagination button:hover:not(.active) { background: #2d3148; }
+  .pagination .page-info { font-size: 12px; color: #64748b; margin-left: auto; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #e2e8f0; border: 1px solid #2d3148; border-radius: 8px; padding: 12px 18px; font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.success { border-color: #22c55e; }
+  .toast.error { border-color: #ef4444; }
+
+  .loading { text-align: center; padding: 40px; color: #64748b; font-size: 14px; }
+  .progress-bar { height: 3px; background: #1e2235; margin: 0; }
+  .progress-fill { height: 100%; background: #2563eb; width: 0%; transition: width 0.3s; }
+
+  .empty { text-align: center; padding: 60px 24px; color: #64748b; }
+  .empty h3 { font-size: 16px; color: #94a3b8; margin-bottom: 8px; }
+  .empty p { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>URL Manager</h1>
+  <span class="badge">dumpsterrental.tech</span>
+  <span style="font-size:12px;color:#64748b;margin-left:auto;">Google Indexing API Tracker — IndexedDB Storage</span>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progBar"></div></div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="label">Total URLs</div><div class="value" id="st-total">0</div></div>
+  <div class="stat green"><div class="label">Submitted</div><div class="value" id="st-submitted">0</div></div>
+  <div class="stat blue"><div class="label">Copied</div><div class="value" id="st-copied">0</div></div>
+  <div class="stat amber"><div class="label">Pending</div><div class="value" id="st-pending">0</div></div>
+  <div class="stat red"><div class="label">Failed</div><div class="value" id="st-failed">0</div></div>
+</div>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="Search URLs..." oninput="filterURLs()">
+  <select id="statusFilter" onchange="filterURLs()">
+    <option value="">All Status</option>
+    <option value="pending">Pending</option>
+    <option value="copied">Copied</option>
+    <option value="submitted">Submitted</option>
+    <option value="indexed">Indexed</option>
+    <option value="failed">Failed</option>
+  </select>
+  <button class="btn btn-ghost" onclick="toggleImport()">+ Import URLs</button>
+  <button class="btn btn-primary" onclick="fetchSitemap()">Fetch Sitemap</button>
+  <button class="btn btn-danger" onclick="clearAll()" style="margin-left:auto;">Clear All</button>
+</div>
+
+<div class="import-section" id="importSection">
+  <div style="font-size:13px;color:#94a3b8;margin-bottom:8px;">Paste URLs (one per line) or paste sitemap XML:</div>
+  <textarea id="importText" placeholder="https://dumpsterrental.tech/page-1&#10;https://dumpsterrental.tech/page-2&#10;...or paste full sitemap XML"></textarea>
+  <div class="row">
+    <button class="btn btn-success" onclick="importURLs()">Import</button>
+    <button class="btn btn-ghost" onclick="toggleImport()">Cancel</button>
+    <span class="info" id="importInfo"></span>
+  </div>
+</div>
+
+<div class="batch-section">
+  <label>Batch size:</label>
+  <input type="number" id="batchSize" value="200" min="1" max="500">
+  <button class="btn btn-amber" onclick="copyNextBatch()">Copy Next Batch (200)</button>
+  <button class="btn btn-success" onclick="markSelectedSubmitted()">Mark Selected as Submitted</button>
+  <button class="btn btn-ghost" onclick="selectAll()">Select All Visible</button>
+  <button class="btn btn-ghost" onclick="deselectAll()">Deselect All</button>
+  <div class="copy-box" id="copyBox"></div>
+</div>
+
+<div class="url-list">
+  <div id="listContainer"><div class="empty"><h3>No URLs yet</h3><p>Click "Fetch Sitemap" or "Import URLs" to get started</p></div></div>
+</div>
+
+<div class="pagination" id="paginationBar" style="display:none;">
+  <div id="pageBtns"></div>
+  <span class="page-info" id="pageInfo"></span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DB_NAME = 'urlmanager_db';
+const STORE = 'urls';
+const PAGE_SIZE = 100;
+let db, allURLs = [], filteredURLs = [], currentPage = 1;
+
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, 2);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        const store = d.createObjectStore(STORE, { keyPath: 'url' });
+        store.createIndex('status', 'status', { unique: false });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+function getAllFromDB() {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+
+function putBatch(records) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    records.forEach(r => store.put(r));
+    tx.oncomplete = res;
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+function updateRecord(url, changes) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    const req = store.get(url);
+    req.onsuccess = () => {
+      const rec = req.result || { url };
+      Object.assign(rec, changes);
+      store.put(rec);
+      tx.oncomplete = res;
+    };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+function clearDB() {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).clear();
+    tx.oncomplete = res;
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+async function loadAll() {
+  allURLs = await getAllFromDB();
+  allURLs.sort((a, b) => a.added - b.added);
+  filterURLs();
+  updateStats();
+}
+
+function updateStats() {
+  const total = allURLs.length;
+  const submitted = allURLs.filter(u => u.status === 'submitted' || u.status === 'indexed').length;
+  const copied = allURLs.filter(u => u.status === 'copied').length;
+  const pending = allURLs.filter(u => u.status === 'pending').length;
+  const failed = allURLs.filter(u => u.status === 'failed').length;
+  document.getElementById('st-total').textContent = total.toLocaleString();
+  document.getElementById('st-submitted').textContent = submitted.toLocaleString();
+  document.getElementById('st-copied').textContent = copied.toLocaleString();
+  document.getElementById('st-pending').textContent = pending.toLocaleString();
+  document.getElementById('st-failed').textContent = failed.toLocaleString();
+  const pct = total ? Math.round(((submitted + copied) / total) * 100) : 0;
+  document.getElementById('progBar').style.width = pct + '%';
+}
+
+function filterURLs() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const st = document.getElementById('statusFilter').value;
+  filteredURLs = allURLs.filter(u => {
+    const matchQ = !q || u.url.toLowerCase().includes(q);
+    const matchSt = !st || u.status === st;
+    return matchQ && matchSt;
+  });
+  currentPage = 1;
+  renderTable();
+  renderPagination();
+}
+
+function renderTable() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+  const pageURLs = filteredURLs.slice(start, end);
+
+  if (filteredURLs.length === 0) {
+    document.getElementById('listContainer').innerHTML = '<div class="empty"><h3>No URLs found</h3><p>Try changing filters</p></div>';
+    document.getElementById('paginationBar').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('paginationBar').style.display = 'flex';
+
+  const rows = pageURLs.map((u, i) => `
+    <tr>
+      <td><input class="chk" type="checkbox" data-url="${u.url}"></td>
+      <td style="color:#64748b;font-size:12px;">${start + i + 1}</td>
+      <td class="url-text" title="${u.url}"><a href="${u.url}" target="_blank" style="color:#93c5fd;text-decoration:none;">${u.url}</a></td>
+      <td><span class="status-badge s-${u.status}">${u.status}</span></td>
+      <td style="color:#64748b;font-size:11px;">${u.copiedAt ? new Date(u.copiedAt).toLocaleDateString() : '-'}</td>
+      <td style="color:#64748b;font-size:11px;">${u.submittedAt ? new Date(u.submittedAt).toLocaleDateString() : '-'}</td>
+      <td>
+        <select style="background:#1a1d2e;border:1px solid #2d3148;color:#e2e8f0;padding:4px 6px;border-radius:4px;font-size:11px;cursor:pointer;" onchange="changeStatus('${u.url}', this.value)">
+          <option value="">Change...</option>
+          <option value="pending">Pending</option>
+          <option value="copied">Copied</option>
+          <option value="submitted">Submitted</option>
+          <option value="indexed">Indexed</option>
+          <option value="failed">Failed</option>
+        </select>
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('listContainer').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30px;"><input class="chk" type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this)"></th>
+          <th style="width:50px;">#</th>
+          <th>URL</th>
+          <th style="width:90px;">Status</th>
+          <th style="width:100px;">Copied</th>
+          <th style="width:100px;">Submitted</th>
+          <th style="width:110px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderPagination() {
+  const total = filteredURLs.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  if (pages <= 1) { document.getElementById('pageBtns').innerHTML = ''; return; }
+
+  let btns = '';
+  const range = 3;
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || (i >= currentPage - range && i <= currentPage + range)) {
+      btns += `<button onclick="goPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+    } else if (i === currentPage - range - 1 || i === currentPage + range + 1) {
+      btns += `<button disabled style="opacity:0.4">...</button>`;
+    }
+  }
+  document.getElementById('pageBtns').innerHTML = btns;
+  document.getElementById('pageInfo').textContent = `Showing ${(currentPage-1)*PAGE_SIZE+1}–${Math.min(currentPage*PAGE_SIZE, total)} of ${total.toLocaleString()} URLs`;
+}
+
+function goPage(p) { currentPage = p; renderTable(); renderPagination(); window.scrollTo(0,0); }
+
+function toggleSelectAll(chk) {
+  document.querySelectorAll('.chk[data-url]').forEach(c => c.checked = chk.checked);
+}
+
+function selectAll() { document.querySelectorAll('.chk[data-url]').forEach(c => c.checked = true); }
+function deselectAll() { document.querySelectorAll('.chk[data-url]').forEach(c => c.checked = false); }
+
+function getChecked() {
+  return [...document.querySelectorAll('.chk[data-url]:checked')].map(c => c.dataset.url);
+}
+
+async function changeStatus(url, status) {
+  if (!status) return;
+  const changes = { status, updatedAt: Date.now() };
+  if (status === 'copied') changes.copiedAt = Date.now();
+  if (status === 'submitted') changes.submittedAt = Date.now();
+  await updateRecord(url, changes);
+  const idx = allURLs.findIndex(u => u.url === url);
+  if (idx >= 0) Object.assign(allURLs[idx], changes);
+  filterURLs();
+  updateStats();
+  showToast('Status updated', 'success');
+}
+
+async function markSelectedSubmitted() {
+  const urls = getChecked();
+  if (!urls.length) { showToast('No URLs selected', 'error'); return; }
+  const now = Date.now();
+  const updates = urls.map(url => ({ url, status: 'submitted', submittedAt: now, updatedAt: now }));
+  await putBatch(updates);
+  updates.forEach(u => { const idx = allURLs.findIndex(r => r.url === u.url); if (idx >= 0) Object.assign(allURLs[idx], u); });
+  filterURLs();
+  updateStats();
+  showToast(`${urls.length} URLs marked as submitted`, 'success');
+}
+
+async function copyNextBatch() {
+  const size = parseInt(document.getElementById('batchSize').value) || 200;
+  const pending = allURLs.filter(u => u.status === 'pending').slice(0, size);
+  if (!pending.length) { showToast('No pending URLs left!', 'error'); return; }
+  const now = Date.now();
+  const urlText = pending.map(u => u.url).join('\n');
+  await navigator.clipboard.writeText(urlText).catch(() => {});
+  const updates = pending.map(u => ({ url: u.url, status: 'copied', copiedAt: now, updatedAt: now }));
+  await putBatch(updates);
+  updates.forEach(u => { const idx = allURLs.findIndex(r => r.url === u.url); if (idx >= 0) Object.assign(allURLs[idx], u); });
+  filterURLs();
+  updateStats();
+  const box = document.getElementById('copyBox');
+  box.style.display = 'block';
+  box.textContent = urlText;
+  showToast(`${pending.length} URLs copied to clipboard & marked`, 'success');
+}
+
+function toggleImport() {
+  const s = document.getElementById('importSection');
+  s.classList.toggle('open');
+}
+
+async function importURLs() {
+  const raw = document.getElementById('importText').value.trim();
+  if (!raw) return;
+  let urls = [];
+  if (raw.includes('<loc>')) {
+    const matches = raw.match(/<loc>(.*?)<\/loc>/g) || [];
+    urls = matches.map(m => m.replace(/<\/?loc>/g, '').trim());
+  } else {
+    urls = raw.split('\n').map(l => l.trim()).filter(l => l.startsWith('http'));
+  }
+  if (!urls.length) { showToast('No valid URLs found', 'error'); return; }
+  const existing = new Set(allURLs.map(u => u.url));
+  const newURLs = urls.filter(u => !existing.has(u)).map(url => ({ url, status: 'pending', added: Date.now() }));
+  if (!newURLs.length) { showToast('All URLs already exist', 'error'); return; }
+  await putBatch(newURLs);
+  allURLs.push(...newURLs);
+  document.getElementById('importText').value = '';
+  document.getElementById('importSection').classList.remove('open');
+  filterURLs();
+  updateStats();
+  showToast(`${newURLs.length} URLs imported (${urls.length - newURLs.length} duplicates skipped)`, 'success');
+}
+
+async function fetchSitemap() {
+  const sitemapURL = 'https://dumpsterrental.tech/sitemap.xml';
+  showToast('Fetching sitemap...', '');
+  try {
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(sitemapURL)}`;
+    const res = await fetch(proxy);
+    const data = await res.json();
+    const xml = data.contents;
+    const matches = xml.match(/<loc>(.*?)<\/loc>/g) || [];
+    const urls = matches.map(m => m.replace(/<\/?loc>/g, '').trim()).filter(u => u.startsWith('http'));
+    if (!urls.length) { showToast('No URLs found in sitemap', 'error'); return; }
+    const existing = new Set(allURLs.map(u => u.url));
+    const newURLs = urls.filter(u => !existing.has(u)).map(url => ({ url, status: 'pending', added: Date.now() }));
+    if (!newURLs.length) { showToast('All sitemap URLs already imported', ''); return; }
+    await putBatch(newURLs);
+    allURLs.push(...newURLs);
+    filterURLs();
+    updateStats();
+    showToast(`${newURLs.length} URLs fetched from sitemap!`, 'success');
+  } catch (e) {
+    showToast('Sitemap fetch failed — use Import manually', 'error');
+  }
+}
+
+async function clearAll() {
+  if (!confirm('Delete all URLs from database?')) return;
+  await clearDB();
+  allURLs = [];
+  filterURLs();
+  updateStats();
+  showToast('All data cleared', 'success');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+openDB().then(loadAll);
+</script>
+</body>
+</html>
