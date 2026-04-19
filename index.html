@@ -5,79 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>URL Manager — dumpsterrental.tech</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
 
-  .header { background: #1a1d2e; border-bottom: 1px solid #2d3148; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .header h1 { font-size: 18px; font-weight: 600; color: #fff; }
-  .header .badge { background: #2563eb; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+.header { background: #1a1d2e; border-bottom: 1px solid #2d3148; padding: 14px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.header h1 { font-size: 17px; font-weight: 600; color: #fff; }
+.badge { background: #2563eb; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
 
-  .stats-bar { display: flex; gap: 12px; padding: 12px 24px; background: #13161f; border-bottom: 1px solid #1e2235; flex-wrap: wrap; }
-  .stat { background: #1a1d2e; border: 1px solid #2d3148; border-radius: 8px; padding: 8px 16px; min-width: 120px; }
-  .stat .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat .value { font-size: 20px; font-weight: 700; color: #fff; margin-top: 2px; }
-  .stat.green .value { color: #22c55e; }
-  .stat.blue .value { color: #3b82f6; }
-  .stat.amber .value { color: #f59e0b; }
-  .stat.red .value { color: #ef4444; }
+.progress-bar { height: 4px; background: #1e2235; }
+.progress-fill { height: 100%; background: #2563eb; transition: width 0.4s; }
 
-  .toolbar { display: flex; gap: 10px; padding: 12px 24px; background: #13161f; border-bottom: 1px solid #1e2235; flex-wrap: wrap; align-items: center; }
-  .toolbar input[type=text] { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 13px; width: 320px; outline: none; }
-  .toolbar input[type=text]:focus { border-color: #3b82f6; }
-  .toolbar select { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer; }
-  .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: opacity 0.15s; }
-  .btn:hover { opacity: 0.85; }
-  .btn-primary { background: #2563eb; color: #fff; }
-  .btn-success { background: #16a34a; color: #fff; }
-  .btn-danger { background: #dc2626; color: #fff; }
-  .btn-ghost { background: #1a1d2e; color: #94a3b8; border: 1px solid #2d3148; }
-  .btn-amber { background: #d97706; color: #fff; }
+.stats-bar { display: flex; gap: 10px; padding: 12px 24px; background: #13161f; border-bottom: 1px solid #1e2235; flex-wrap: wrap; }
+.stat { background: #1a1d2e; border: 1px solid #2d3148; border-radius: 8px; padding: 8px 14px; min-width: 110px; }
+.stat .label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat .value { font-size: 19px; font-weight: 700; color: #fff; margin-top: 1px; }
+.stat.green .value { color: #22c55e; }
+.stat.blue .value { color: #3b82f6; }
+.stat.amber .value { color: #f59e0b; }
+.stat.red .value { color: #ef4444; }
+.stat.purple .value { color: #a78bfa; }
 
-  .import-section { padding: 16px 24px; background: #13161f; border-bottom: 1px solid #1e2235; display: none; }
-  .import-section.open { display: block; }
-  .import-section textarea { width: 100%; background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 10px; border-radius: 6px; font-size: 12px; font-family: monospace; height: 120px; resize: vertical; outline: none; }
-  .import-section .row { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
-  .import-section .info { font-size: 12px; color: #64748b; }
+.toolbar { display: flex; gap: 8px; padding: 10px 24px; background: #13161f; border-bottom: 1px solid #1e2235; flex-wrap: wrap; align-items: center; }
+.toolbar input[type=text] { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 7px 11px; border-radius: 6px; font-size: 13px; width: 240px; outline: none; }
+.toolbar input[type=text]:focus { border-color: #3b82f6; }
+.toolbar select { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 7px 10px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer; }
+.btn { padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+.btn:hover { opacity: 0.82; }
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-success { background: #16a34a; color: #fff; }
+.btn-danger { background: #dc2626; color: #fff; }
+.btn-ghost { background: #1a1d2e; color: #94a3b8; border: 1px solid #2d3148; }
+.btn-amber { background: #d97706; color: #fff; font-size: 14px; font-weight: 700; padding: 9px 20px; }
 
-  .batch-section { padding: 12px 24px; background: #0f1117; border-bottom: 1px solid #1e2235; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .batch-section label { font-size: 13px; color: #94a3b8; }
-  .batch-section input[type=number] { background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 6px 10px; border-radius: 6px; font-size: 13px; width: 80px; outline: none; }
-  .copy-box { background: #1a1d2e; border: 1px solid #2d3148; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #94a3b8; font-family: monospace; max-height: 100px; overflow-y: auto; word-break: break-all; display: none; margin-top: 8px; white-space: pre-wrap; }
+.import-section { padding: 14px 24px; background: #13161f; border-bottom: 1px solid #1e2235; display: none; }
+.import-section.open { display: block; }
+.file-drop { border: 1px dashed #2d3148; border-radius: 6px; padding: 14px; text-align: center; cursor: pointer; margin-bottom: 8px; color: #64748b; font-size: 13px; }
+.file-drop:hover { border-color: #3b82f6; color: #93c5fd; }
+.file-drop input { display: none; }
+.import-section textarea { width: 100%; background: #1a1d2e; border: 1px solid #2d3148; color: #e2e8f0; padding: 10px; border-radius: 6px; font-size: 12px; font-family: monospace; height: 100px; resize: vertical; outline: none; margin-bottom: 8px; }
+.import-row { display: flex; gap: 8px; align-items: center; }
 
-  .url-list { padding: 0 24px 24px; }
-  .url-list table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
-  .url-list th { background: #1a1d2e; color: #64748b; font-weight: 500; padding: 10px 12px; text-align: left; border-bottom: 1px solid #2d3148; position: sticky; top: 0; }
-  .url-list td { padding: 9px 12px; border-bottom: 1px solid #1e2235; color: #cbd5e1; vertical-align: middle; }
-  .url-list tr:hover td { background: #1a1d2e; }
-  .url-list .url-text { max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #93c5fd; font-family: monospace; font-size: 12px; }
+.url-list { padding: 0 24px 90px; }
+.url-list table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+.url-list th { background: #1a1d2e; color: #64748b; font-weight: 500; padding: 9px 12px; text-align: left; border-bottom: 1px solid #2d3148; }
+.url-list td { padding: 8px 12px; border-bottom: 1px solid #1e2235; color: #cbd5e1; vertical-align: middle; }
+.url-list tr:hover td { background: #161929; }
+.url-cell { max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; font-size: 11px; }
+.url-cell a { color: #93c5fd; text-decoration: none; }
 
-  .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-  .s-pending { background: #1e2235; color: #64748b; }
-  .s-copied { background: #1e3a5f; color: #60a5fa; }
-  .s-submitted { background: #14532d; color: #4ade80; }
-  .s-indexed { background: #1a3a1a; color: #22c55e; }
-  .s-failed { background: #3b0f0f; color: #f87171; }
+.status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.s-pending  { background: #1e2235; color: #64748b; }
+.s-copied   { background: #1e3a5f; color: #60a5fa; }
+.s-submitted{ background: #14532d; color: #4ade80; }
+.s-indexed  { background: #1a3a1a; color: #22c55e; }
+.s-failed   { background: #3b0f0f; color: #f87171; }
 
-  .chk { cursor: pointer; width: 15px; height: 15px; accent-color: #3b82f6; }
+.chk { cursor: pointer; width: 14px; height: 14px; accent-color: #3b82f6; }
 
-  .pagination { display: flex; gap: 8px; align-items: center; padding: 16px 24px; background: #13161f; border-top: 1px solid #1e2235; flex-wrap: wrap; }
-  .pagination button { background: #1a1d2e; border: 1px solid #2d3148; color: #94a3b8; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-  .pagination button.active { background: #2563eb; color: #fff; border-color: #2563eb; }
-  .pagination button:hover:not(.active) { background: #2d3148; }
-  .pagination .page-info { font-size: 12px; color: #64748b; margin-left: auto; }
+/* Fixed bottom action bar */
+.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1d2e; border-top: 2px solid #2563eb; padding: 10px 24px; display: flex; gap: 10px; align-items: center; z-index: 100; flex-wrap: wrap; }
+.bottom-bar .batch-info { font-size: 12px; color: #94a3b8; }
+.bottom-bar .batch-info strong { color: #e2e8f0; }
+.nav-group { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.nav-group button { background: #13161f; border: 1px solid #2d3148; color: #94a3b8; padding: 5px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+.nav-group button:hover { background: #2d3148; }
+.nav-group .cur { font-size: 13px; font-weight: 700; color: #fff; min-width: 100px; text-align: center; background: #13161f; border: 1px solid #3b82f6; border-radius: 5px; padding: 5px 10px; }
 
-  .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #e2e8f0; border: 1px solid #2d3148; border-radius: 8px; padding: 12px 18px; font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
-  .toast.show { opacity: 1; }
-  .toast.success { border-color: #22c55e; }
-  .toast.error { border-color: #ef4444; }
+.toast { position: fixed; bottom: 72px; right: 24px; background: #1e293b; border: 1px solid #2d3148; border-radius: 8px; padding: 10px 16px; font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.2s; pointer-events: none; max-width: 320px; }
+.toast.show { opacity: 1; }
+.toast.success { border-color: #22c55e; }
+.toast.error { border-color: #ef4444; }
 
-  .loading { text-align: center; padding: 40px; color: #64748b; font-size: 14px; }
-  .progress-bar { height: 3px; background: #1e2235; margin: 0; }
-  .progress-fill { height: 100%; background: #2563eb; width: 0%; transition: width 0.3s; }
-
-  .empty { text-align: center; padding: 60px 24px; color: #64748b; }
-  .empty h3 { font-size: 16px; color: #94a3b8; margin-bottom: 8px; }
-  .empty p { font-size: 13px; }
+.empty { text-align: center; padding: 60px 24px; color: #64748b; }
+.empty h3 { font-size: 16px; color: #94a3b8; margin-bottom: 8px; }
+.done-banner { background: #14532d; border: 1px solid #22c55e; border-radius: 8px; padding: 24px; text-align: center; margin: 24px 0; }
+.done-banner h3 { color: #4ade80; font-size: 17px; margin-bottom: 6px; }
+.done-banner p { color: #86efac; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -85,22 +88,26 @@
 <div class="header">
   <h1>URL Manager</h1>
   <span class="badge">dumpsterrental.tech</span>
-  <span style="font-size:12px;color:#64748b;margin-left:auto;">Google Indexing API Tracker — IndexedDB Storage</span>
+  <span id="pctTxt" style="font-size:12px;color:#64748b;"></span>
+  <button class="btn btn-ghost" style="margin-left:auto;font-size:12px;" onclick="toggleImport()">+ Import</button>
+  <button class="btn btn-primary" style="font-size:12px;" onclick="fetchSitemap()">Fetch Sitemap</button>
+  <button class="btn btn-danger" style="font-size:12px;" onclick="clearAll()">Clear All</button>
 </div>
 
-<div class="progress-bar"><div class="progress-fill" id="progBar"></div></div>
+<div class="progress-bar"><div class="progress-fill" id="progBar" style="width:0%"></div></div>
 
 <div class="stats-bar">
-  <div class="stat"><div class="label">Total URLs</div><div class="value" id="st-total">0</div></div>
-  <div class="stat green"><div class="label">Submitted</div><div class="value" id="st-submitted">0</div></div>
-  <div class="stat blue"><div class="label">Copied</div><div class="value" id="st-copied">0</div></div>
+  <div class="stat"><div class="label">Total</div><div class="value" id="st-total">0</div></div>
+  <div class="stat purple"><div class="label">Batches left</div><div class="value" id="st-batches">0</div></div>
   <div class="stat amber"><div class="label">Pending</div><div class="value" id="st-pending">0</div></div>
+  <div class="stat blue"><div class="label">Copied</div><div class="value" id="st-copied">0</div></div>
+  <div class="stat green"><div class="label">Submitted</div><div class="value" id="st-submitted">0</div></div>
   <div class="stat red"><div class="label">Failed</div><div class="value" id="st-failed">0</div></div>
 </div>
 
 <div class="toolbar">
-  <input type="text" id="searchInput" placeholder="Search URLs..." oninput="filterURLs()">
-  <select id="statusFilter" onchange="filterURLs()">
+  <input type="text" id="searchInput" placeholder="Search URLs..." oninput="onSearch()">
+  <select id="statusFilter" onchange="onSearch()">
     <option value="">All Status</option>
     <option value="pending">Pending</option>
     <option value="copied">Copied</option>
@@ -108,333 +115,288 @@
     <option value="indexed">Indexed</option>
     <option value="failed">Failed</option>
   </select>
-  <button class="btn btn-ghost" onclick="toggleImport()">+ Import URLs</button>
-  <button class="btn btn-primary" onclick="fetchSitemap()">Fetch Sitemap</button>
-  <button class="btn btn-danger" onclick="clearAll()" style="margin-left:auto;">Clear All</button>
+  <button class="btn btn-ghost" onclick="selectAll()">Select All</button>
+  <button class="btn btn-ghost" onclick="deselectAll()">Deselect</button>
+  <button class="btn btn-success" onclick="markSelectedSubmitted()">Mark Submitted</button>
 </div>
 
 <div class="import-section" id="importSection">
-  <div style="font-size:13px;color:#94a3b8;margin-bottom:8px;">Paste URLs (one per line) or paste sitemap XML:</div>
-  <textarea id="importText" placeholder="https://dumpsterrental.tech/page-1&#10;https://dumpsterrental.tech/page-2&#10;...or paste full sitemap XML"></textarea>
-  <div class="row">
-    <button class="btn btn-success" onclick="importURLs()">Import</button>
+  <div class="file-drop" onclick="document.getElementById('fileInput').click()">
+    Click to upload <strong>urls.txt</strong> or <strong>sitemap.xml</strong> (supports 27k+ URLs)
+    <input type="file" id="fileInput" accept=".txt,.xml" onchange="handleFile(this)">
+  </div>
+  <textarea id="importText" placeholder="Or paste URLs (one per line) or sitemap XML here..."></textarea>
+  <div class="import-row">
+    <button class="btn btn-success" onclick="importFromText()">Import</button>
     <button class="btn btn-ghost" onclick="toggleImport()">Cancel</button>
-    <span class="info" id="importInfo"></span>
+    <span id="importInfo" style="font-size:12px;color:#64748b;"></span>
   </div>
 </div>
 
-<div class="batch-section">
-  <label>Batch size:</label>
-  <input type="number" id="batchSize" value="200" min="1" max="500">
-  <button class="btn btn-amber" onclick="copyNextBatch()">Copy Next Batch (200)</button>
-  <button class="btn btn-success" onclick="markSelectedSubmitted()">Mark Selected as Submitted</button>
-  <button class="btn btn-ghost" onclick="selectAll()">Select All Visible</button>
-  <button class="btn btn-ghost" onclick="deselectAll()">Deselect All</button>
-  <div class="copy-box" id="copyBox"></div>
-</div>
-
 <div class="url-list">
-  <div id="listContainer"><div class="empty"><h3>No URLs yet</h3><p>Click "Fetch Sitemap" or "Import URLs" to get started</p></div></div>
+  <div id="listContainer">
+    <div class="empty"><h3>No URLs yet</h3><p>Upload urls.txt or click "Fetch Sitemap"</p></div>
+  </div>
 </div>
 
-<div class="pagination" id="paginationBar" style="display:none;">
-  <div id="pageBtns"></div>
-  <span class="page-info" id="pageInfo"></span>
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+  <button class="btn btn-amber" onclick="copyCurrentBatch()">📋 Copy Batch</button>
+  <button class="btn btn-success" onclick="markBatchSubmitted()">✓ Mark Submitted</button>
+  <span class="batch-info" id="batchInfo"></span>
+  <div class="nav-group">
+    <button onclick="prevBatch()">← Prev</button>
+    <span class="cur" id="batchLabel">Batch 1/1</span>
+    <button onclick="nextBatch()">Next →</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const DB_NAME = 'urlmanager_db';
-const STORE = 'urls';
-const PAGE_SIZE = 100;
-let db, allURLs = [], filteredURLs = [], currentPage = 1;
+const DB_NAME = 'urlmgr_v4', STORE = 'urls', BATCH = 200;
+let db, allURLs = [], viewURLs = [], curBatch = 1;
 
+// ── DB ─────────────────────────────────────────────────
 function openDB() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open(DB_NAME, 2);
-    req.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains(STORE)) {
-        const store = d.createObjectStore(STORE, { keyPath: 'url' });
-        store.createIndex('status', 'status', { unique: false });
-      }
-    };
-    req.onsuccess = e => { db = e.target.result; res(db); };
-    req.onerror = () => rej(req.error);
+  return new Promise((res,rej) => {
+    const r = indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded = e => { if(!e.target.result.objectStoreNames.contains(STORE)) e.target.result.createObjectStore(STORE,{keyPath:'url'}); };
+    r.onsuccess = e => { db=e.target.result; res(db); };
+    r.onerror = ()=>rej(r.error);
   });
 }
-
-function getAllFromDB() {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(STORE, 'readonly');
-    const req = tx.objectStore(STORE).getAll();
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
+function dbGetAll() {
+  return new Promise((res,rej) => { const r=db.transaction(STORE,'readonly').objectStore(STORE).getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+}
+function dbPutBatch(recs) {
+  return new Promise((res,rej) => { const tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE); recs.forEach(r=>s.put(r)); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); });
+}
+function dbClear() {
+  return new Promise((res,rej) => { const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).clear(); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); });
 }
 
-function putBatch(records) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    records.forEach(r => store.put(r));
-    tx.oncomplete = res;
-    tx.onerror = () => rej(tx.error);
-  });
-}
-
-function updateRecord(url, changes) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    const req = store.get(url);
-    req.onsuccess = () => {
-      const rec = req.result || { url };
-      Object.assign(rec, changes);
-      store.put(rec);
-      tx.oncomplete = res;
-    };
-    req.onerror = () => rej(req.error);
-  });
-}
-
-function clearDB() {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(STORE, 'readwrite');
-    tx.objectStore(STORE).clear();
-    tx.oncomplete = res;
-    tx.onerror = () => rej(tx.error);
-  });
-}
-
+// ── Init ───────────────────────────────────────────────
 async function loadAll() {
-  allURLs = await getAllFromDB();
-  allURLs.sort((a, b) => a.added - b.added);
-  filterURLs();
-  updateStats();
+  allURLs = await dbGetAll();
+  allURLs.sort((a,b)=>(a.added||0)-(b.added||0));
+  viewURLs = allURLs;
+  updateStats(); render();
 }
 
 function updateStats() {
-  const total = allURLs.length;
-  const submitted = allURLs.filter(u => u.status === 'submitted' || u.status === 'indexed').length;
-  const copied = allURLs.filter(u => u.status === 'copied').length;
-  const pending = allURLs.filter(u => u.status === 'pending').length;
-  const failed = allURLs.filter(u => u.status === 'failed').length;
-  document.getElementById('st-total').textContent = total.toLocaleString();
-  document.getElementById('st-submitted').textContent = submitted.toLocaleString();
-  document.getElementById('st-copied').textContent = copied.toLocaleString();
-  document.getElementById('st-pending').textContent = pending.toLocaleString();
-  document.getElementById('st-failed').textContent = failed.toLocaleString();
-  const pct = total ? Math.round(((submitted + copied) / total) * 100) : 0;
-  document.getElementById('progBar').style.width = pct + '%';
+  const total=allURLs.length;
+  const pending=allURLs.filter(u=>u.status==='pending').length;
+  const copied=allURLs.filter(u=>u.status==='copied').length;
+  const submitted=allURLs.filter(u=>u.status==='submitted'||u.status==='indexed').length;
+  const failed=allURLs.filter(u=>u.status==='failed').length;
+  document.getElementById('st-total').textContent=total.toLocaleString();
+  document.getElementById('st-pending').textContent=pending.toLocaleString();
+  document.getElementById('st-copied').textContent=copied.toLocaleString();
+  document.getElementById('st-submitted').textContent=submitted.toLocaleString();
+  document.getElementById('st-failed').textContent=failed.toLocaleString();
+  document.getElementById('st-batches').textContent=Math.ceil(pending/BATCH)||0;
+  const pct=total?Math.round(((submitted+copied)/total)*100):0;
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('pctTxt').textContent=total?(pct+'% done'):'';
 }
 
-function filterURLs() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const st = document.getElementById('statusFilter').value;
-  filteredURLs = allURLs.filter(u => {
-    const matchQ = !q || u.url.toLowerCase().includes(q);
-    const matchSt = !st || u.status === st;
-    return matchQ && matchSt;
-  });
-  currentPage = 1;
-  renderTable();
-  renderPagination();
-}
+// ── Render current batch ───────────────────────────────
+function pendingURLs() { return viewURLs.filter(u=>u.status==='pending'); }
+function totalBatches() { return Math.max(1,Math.ceil(pendingURLs().length/BATCH)); }
 
-function renderTable() {
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const pageURLs = filteredURLs.slice(start, end);
+function render() {
+  const tb=totalBatches();
+  if(curBatch>tb) curBatch=tb;
+  const pending=pendingURLs();
+  const start=(curBatch-1)*BATCH;
+  const batch=pending.slice(start,start+BATCH);
 
-  if (filteredURLs.length === 0) {
-    document.getElementById('listContainer').innerHTML = '<div class="empty"><h3>No URLs found</h3><p>Try changing filters</p></div>';
-    document.getElementById('paginationBar').style.display = 'none';
+  document.getElementById('bottomBar').style.display=allURLs.length?'flex':'none';
+  document.getElementById('batchLabel').textContent=`Batch ${curBatch}/${tb}`;
+  document.getElementById('batchInfo').innerHTML=`<strong>${batch.length}</strong> URLs this batch &nbsp;|&nbsp; <strong>${pending.length.toLocaleString()}</strong> pending`;
+
+  if(!allURLs.length){
+    document.getElementById('listContainer').innerHTML='<div class="empty"><h3>No URLs yet</h3><p>Upload urls.txt or click Fetch Sitemap</p></div>';
+    return;
+  }
+  if(!batch.length && !pending.length){
+    document.getElementById('listContainer').innerHTML=`<div class="done-banner"><h3>All batches complete!</h3><p>${allURLs.filter(u=>u.status==='submitted'||u.status==='indexed').length.toLocaleString()} URLs submitted successfully.</p></div>`;
     return;
   }
 
-  document.getElementById('paginationBar').style.display = 'flex';
-
-  const rows = pageURLs.map((u, i) => `
+  const rows=batch.map((u,i)=>`
     <tr>
       <td><input class="chk" type="checkbox" data-url="${u.url}"></td>
-      <td style="color:#64748b;font-size:12px;">${start + i + 1}</td>
-      <td class="url-text" title="${u.url}"><a href="${u.url}" target="_blank" style="color:#93c5fd;text-decoration:none;">${u.url}</a></td>
+      <td style="color:#64748b;font-size:11px;">${start+i+1}</td>
+      <td class="url-cell"><a href="${u.url}" target="_blank">${u.url}</a></td>
       <td><span class="status-badge s-${u.status}">${u.status}</span></td>
-      <td style="color:#64748b;font-size:11px;">${u.copiedAt ? new Date(u.copiedAt).toLocaleDateString() : '-'}</td>
-      <td style="color:#64748b;font-size:11px;">${u.submittedAt ? new Date(u.submittedAt).toLocaleDateString() : '-'}</td>
       <td>
-        <select style="background:#1a1d2e;border:1px solid #2d3148;color:#e2e8f0;padding:4px 6px;border-radius:4px;font-size:11px;cursor:pointer;" onchange="changeStatus('${u.url}', this.value)">
+        <select style="background:#1a1d2e;border:1px solid #2d3148;color:#e2e8f0;padding:3px 6px;border-radius:4px;font-size:11px;cursor:pointer;" onchange="changeStatus('${u.url}',this.value)">
           <option value="">Change...</option>
-          <option value="pending">Pending</option>
-          <option value="copied">Copied</option>
           <option value="submitted">Submitted</option>
           <option value="indexed">Indexed</option>
           <option value="failed">Failed</option>
+          <option value="pending">Reset</option>
         </select>
       </td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 
-  document.getElementById('listContainer').innerHTML = `
+  document.getElementById('listContainer').innerHTML=`
     <table>
-      <thead>
-        <tr>
-          <th style="width:30px;"><input class="chk" type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this)"></th>
-          <th style="width:50px;">#</th>
-          <th>URL</th>
-          <th style="width:90px;">Status</th>
-          <th style="width:100px;">Copied</th>
-          <th style="width:100px;">Submitted</th>
-          <th style="width:110px;">Action</th>
-        </tr>
-      </thead>
+      <thead><tr>
+        <th style="width:28px;"><input class="chk" type="checkbox" onchange="toggleSelectAll(this)"></th>
+        <th style="width:46px;">#</th>
+        <th>URL</th>
+        <th style="width:80px;">Status</th>
+        <th style="width:110px;">Action</th>
+      </tr></thead>
       <tbody>${rows}</tbody>
-    </table>
-  `;
+    </table>`;
 }
 
-function renderPagination() {
-  const total = filteredURLs.length;
-  const pages = Math.ceil(total / PAGE_SIZE);
-  if (pages <= 1) { document.getElementById('pageBtns').innerHTML = ''; return; }
+// ── Batch actions ──────────────────────────────────────
+async function copyCurrentBatch() {
+  const pending=pendingURLs();
+  const start=(curBatch-1)*BATCH;
+  const batch=pending.slice(start,start+BATCH);
+  if(!batch.length){showToast('No pending URLs','error');return;}
 
-  let btns = '';
-  const range = 3;
-  for (let i = 1; i <= pages; i++) {
-    if (i === 1 || i === pages || (i >= currentPage - range && i <= currentPage + range)) {
-      btns += `<button onclick="goPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
-    } else if (i === currentPage - range - 1 || i === currentPage + range + 1) {
-      btns += `<button disabled style="opacity:0.4">...</button>`;
-    }
-  }
-  document.getElementById('pageBtns').innerHTML = btns;
-  document.getElementById('pageInfo').textContent = `Showing ${(currentPage-1)*PAGE_SIZE+1}–${Math.min(currentPage*PAGE_SIZE, total)} of ${total.toLocaleString()} URLs`;
-}
+  const text=batch.map(u=>u.url).join('\n');
+  try{await navigator.clipboard.writeText(text);}catch(e){}
 
-function goPage(p) { currentPage = p; renderTable(); renderPagination(); window.scrollTo(0,0); }
-
-function toggleSelectAll(chk) {
-  document.querySelectorAll('.chk[data-url]').forEach(c => c.checked = chk.checked);
-}
-
-function selectAll() { document.querySelectorAll('.chk[data-url]').forEach(c => c.checked = true); }
-function deselectAll() { document.querySelectorAll('.chk[data-url]').forEach(c => c.checked = false); }
-
-function getChecked() {
-  return [...document.querySelectorAll('.chk[data-url]:checked')].map(c => c.dataset.url);
-}
-
-async function changeStatus(url, status) {
-  if (!status) return;
-  const changes = { status, updatedAt: Date.now() };
-  if (status === 'copied') changes.copiedAt = Date.now();
-  if (status === 'submitted') changes.submittedAt = Date.now();
-  await updateRecord(url, changes);
-  const idx = allURLs.findIndex(u => u.url === url);
-  if (idx >= 0) Object.assign(allURLs[idx], changes);
-  filterURLs();
+  const now=Date.now();
+  const updates=batch.map(u=>({...u,status:'copied',copiedAt:now,updatedAt:now}));
+  await dbPutBatch(updates);
+  updates.forEach(u=>{const i=allURLs.findIndex(r=>r.url===u.url);if(i>=0)Object.assign(allURLs[i],u);});
   updateStats();
-  showToast('Status updated', 'success');
+  showToast(`${batch.length} URLs copied! Auto-advancing...`,'success');
+
+  // Auto-advance after 700ms
+  setTimeout(()=>{
+    const tb=totalBatches();
+    if(curBatch<tb) curBatch++;
+    render();
+    window.scrollTo(0,0);
+  },700);
+}
+
+async function markBatchSubmitted() {
+  const checked=getChecked();
+  const pending=pendingURLs();
+  const start=(curBatch-1)*BATCH;
+  const batch=pending.slice(start,start+BATCH);
+  const targets=checked.length?allURLs.filter(u=>checked.includes(u.url)):batch;
+  if(!targets.length){showToast('Nothing to mark','error');return;}
+  const now=Date.now();
+  const updates=targets.map(u=>({...u,status:'submitted',submittedAt:now,updatedAt:now}));
+  await dbPutBatch(updates);
+  updates.forEach(u=>{const i=allURLs.findIndex(r=>r.url===u.url);if(i>=0)Object.assign(allURLs[i],u);});
+  updateStats(); render();
+  showToast(`${targets.length} marked submitted`,'success');
 }
 
 async function markSelectedSubmitted() {
-  const urls = getChecked();
-  if (!urls.length) { showToast('No URLs selected', 'error'); return; }
-  const now = Date.now();
-  const updates = urls.map(url => ({ url, status: 'submitted', submittedAt: now, updatedAt: now }));
-  await putBatch(updates);
-  updates.forEach(u => { const idx = allURLs.findIndex(r => r.url === u.url); if (idx >= 0) Object.assign(allURLs[idx], u); });
-  filterURLs();
-  updateStats();
-  showToast(`${urls.length} URLs marked as submitted`, 'success');
+  const checked=getChecked();
+  if(!checked.length){showToast('Select URLs first','error');return;}
+  const now=Date.now();
+  const updates=checked.map(url=>({url,status:'submitted',submittedAt:now,updatedAt:now}));
+  await dbPutBatch(updates);
+  updates.forEach(u=>{const i=allURLs.findIndex(r=>r.url===u.url);if(i>=0)Object.assign(allURLs[i],u);});
+  updateStats(); render();
+  showToast(`${checked.length} marked submitted`,'success');
 }
 
-async function copyNextBatch() {
-  const size = parseInt(document.getElementById('batchSize').value) || 200;
-  const pending = allURLs.filter(u => u.status === 'pending').slice(0, size);
-  if (!pending.length) { showToast('No pending URLs left!', 'error'); return; }
-  const now = Date.now();
-  const urlText = pending.map(u => u.url).join('\n');
-  await navigator.clipboard.writeText(urlText).catch(() => {});
-  const updates = pending.map(u => ({ url: u.url, status: 'copied', copiedAt: now, updatedAt: now }));
-  await putBatch(updates);
-  updates.forEach(u => { const idx = allURLs.findIndex(r => r.url === u.url); if (idx >= 0) Object.assign(allURLs[idx], u); });
-  filterURLs();
-  updateStats();
-  const box = document.getElementById('copyBox');
-  box.style.display = 'block';
-  box.textContent = urlText;
-  showToast(`${pending.length} URLs copied to clipboard & marked`, 'success');
+async function changeStatus(url,status){
+  if(!status)return;
+  const now=Date.now();
+  const changes={status,updatedAt:now};
+  if(status==='submitted')changes.submittedAt=now;
+  if(status==='copied')changes.copiedAt=now;
+  await dbPutBatch([{url,...changes}]);
+  const i=allURLs.findIndex(r=>r.url===url);
+  if(i>=0)Object.assign(allURLs[i],changes);
+  updateStats(); render();
 }
 
-function toggleImport() {
-  const s = document.getElementById('importSection');
-  s.classList.toggle('open');
+function prevBatch(){if(curBatch>1){curBatch--;render();window.scrollTo(0,0);}}
+function nextBatch(){if(curBatch<totalBatches()){curBatch++;render();window.scrollTo(0,0);}}
+
+// ── Search ─────────────────────────────────────────────
+function onSearch(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const st=document.getElementById('statusFilter').value;
+  viewURLs=allURLs.filter(u=>(!q||u.url.toLowerCase().includes(q))&&(!st||u.status===st));
+  curBatch=1; render();
 }
 
-async function importURLs() {
-  const raw = document.getElementById('importText').value.trim();
-  if (!raw) return;
-  let urls = [];
-  if (raw.includes('<loc>')) {
-    const matches = raw.match(/<loc>(.*?)<\/loc>/g) || [];
-    urls = matches.map(m => m.replace(/<\/?loc>/g, '').trim());
-  } else {
-    urls = raw.split('\n').map(l => l.trim()).filter(l => l.startsWith('http'));
+// ── Checkbox ───────────────────────────────────────────
+function toggleSelectAll(c){document.querySelectorAll('.chk[data-url]').forEach(x=>x.checked=c.checked);}
+function selectAll(){document.querySelectorAll('.chk[data-url]').forEach(x=>x.checked=true);}
+function deselectAll(){document.querySelectorAll('.chk[data-url]').forEach(x=>x.checked=false);}
+function getChecked(){return[...document.querySelectorAll('.chk[data-url]:checked')].map(c=>c.dataset.url);}
+
+// ── Import ─────────────────────────────────────────────
+function toggleImport(){document.getElementById('importSection').classList.toggle('open');}
+
+function parseURLs(raw){
+  if(raw.includes('<loc>')){
+    return(raw.match(/<loc>(.*?)<\/loc>/g)||[]).map(m=>m.replace(/<\/?loc>/g,'').trim()).filter(u=>u.startsWith('http'));
   }
-  if (!urls.length) { showToast('No valid URLs found', 'error'); return; }
-  const existing = new Set(allURLs.map(u => u.url));
-  const newURLs = urls.filter(u => !existing.has(u)).map(url => ({ url, status: 'pending', added: Date.now() }));
-  if (!newURLs.length) { showToast('All URLs already exist', 'error'); return; }
-  await putBatch(newURLs);
+  return raw.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('http'));
+}
+
+async function doImport(urls){
+  if(!urls.length){showToast('No valid URLs','error');return;}
+  const existing=new Set(allURLs.map(u=>u.url));
+  const newURLs=urls.filter(u=>!existing.has(u)).map(url=>({url,status:'pending',added:Date.now()}));
+  if(!newURLs.length){showToast('All URLs already imported','error');return;}
+  // chunk insert for 27k
+  for(let i=0;i<newURLs.length;i+=2000) await dbPutBatch(newURLs.slice(i,i+2000));
   allURLs.push(...newURLs);
-  document.getElementById('importText').value = '';
+  viewURLs=allURLs; curBatch=1;
+  updateStats(); render();
+  showToast(`${newURLs.length.toLocaleString()} URLs imported!`,'success');
+}
+
+async function importFromText(){
+  const raw=document.getElementById('importText').value.trim();
+  if(!raw)return;
+  await doImport(parseURLs(raw));
+  document.getElementById('importText').value='';
   document.getElementById('importSection').classList.remove('open');
-  filterURLs();
-  updateStats();
-  showToast(`${newURLs.length} URLs imported (${urls.length - newURLs.length} duplicates skipped)`, 'success');
 }
 
-async function fetchSitemap() {
-  const sitemapURL = 'https://dumpsterrental.tech/sitemap.xml';
-  showToast('Fetching sitemap...', '');
-  try {
-    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(sitemapURL)}`;
-    const res = await fetch(proxy);
-    const data = await res.json();
-    const xml = data.contents;
-    const matches = xml.match(/<loc>(.*?)<\/loc>/g) || [];
-    const urls = matches.map(m => m.replace(/<\/?loc>/g, '').trim()).filter(u => u.startsWith('http'));
-    if (!urls.length) { showToast('No URLs found in sitemap', 'error'); return; }
-    const existing = new Set(allURLs.map(u => u.url));
-    const newURLs = urls.filter(u => !existing.has(u)).map(url => ({ url, status: 'pending', added: Date.now() }));
-    if (!newURLs.length) { showToast('All sitemap URLs already imported', ''); return; }
-    await putBatch(newURLs);
-    allURLs.push(...newURLs);
-    filterURLs();
-    updateStats();
-    showToast(`${newURLs.length} URLs fetched from sitemap!`, 'success');
-  } catch (e) {
-    showToast('Sitemap fetch failed — use Import manually', 'error');
-  }
+async function handleFile(input){
+  const file=input.files[0]; if(!file)return;
+  showToast('Reading file...','');
+  const text=await file.text();
+  await doImport(parseURLs(text));
+  input.value='';
+  document.getElementById('importSection').classList.remove('open');
 }
 
-async function clearAll() {
-  if (!confirm('Delete all URLs from database?')) return;
-  await clearDB();
-  allURLs = [];
-  filterURLs();
-  updateStats();
-  showToast('All data cleared', 'success');
+async function fetchSitemap(){
+  showToast('Fetching sitemap...','');
+  try{
+    const url='https://dumpsterrental.tech/sitemap.xml';
+    const res=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+    const data=await res.json();
+    const urls=parseURLs(data.contents||'');
+    if(!urls.length){showToast('No URLs — import manually','error');return;}
+    await doImport(urls);
+  }catch(e){showToast('Fetch failed — use file upload','error');}
 }
 
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  setTimeout(() => { t.className = 'toast'; }, 3000);
+async function clearAll(){
+  if(!confirm('Delete ALL data?'))return;
+  await dbClear(); allURLs=[]; viewURLs=[]; curBatch=1;
+  updateStats(); render(); showToast('Cleared','success');
+}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  clearTimeout(t._t); t._t=setTimeout(()=>{t.className='toast';},3000);
 }
 
 openDB().then(loadAll);
